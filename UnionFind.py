@@ -1,4 +1,5 @@
 import networkx as netx
+import keyboard as kb
 import matplotlib.pyplot as plot
 from matplotlib.animation import FuncAnimation as anim
 import random as rand
@@ -111,8 +112,10 @@ def updateGraph(step, graph, graphToDisplay):
 
     # Allow user to manually progress the graph
    
-    if (step >= 1):
-        moveStep = input("Please input any value to move to the next step")
+    if (step >= 1 and step < len(graphToDisplay.steps) - 1):
+        kb.wait('right')
+        step+=1
+    
     
 
     
@@ -134,5 +137,8 @@ def updateGraph(step, graph, graphToDisplay):
     if step == len(graphToDisplay.steps) - 1:
         text += "\nDone!"
     graph.set_title(text, fontsize=12)    
+
+
+
 
 displayGraph(makeRandomGraph())
