@@ -1,5 +1,6 @@
 import networkx as netx
 import matplotlib.pyplot as plot
+import tkinter
 from matplotlib.animation import FuncAnimation as anim
 import random as rand
 
@@ -28,6 +29,7 @@ class UnionFind:
     # This makes the node with more children the parent when attempting to joint two nodes
     def union(self, p, q):
         # This ensures that the graph before the unions occur is copied such that it can be displayed
+
         if len(self.steps) == 0:
             self.steps.append(self.graph.copy())  # Store current step for visualization purposes
         r = self.find(p)
@@ -98,15 +100,23 @@ def preMadeGraph():
 
 # Simply displays the output and updates for each step as well as the list of parent values
 # timer is in milliseconds
-def displayGraph(graphToDisplay, delayTimer):
+def displayGraph(graphToDisplay):
     graph, ax = plot.subplots()
-    update = anim(graph, updateGraph, frames = len(graphToDisplay.steps), fargs = (ax, graphToDisplay), interval = delayTimer, repeat = False)
+    update = anim(graph, updateGraph, frames = len(graphToDisplay.steps), fargs = (ax, graphToDisplay), repeat = False)
     graphToDisplay.printGraphList() # This call displays the graph parent list in the console
     plot.show()
 
 # Updates graph for every step of the union
 def updateGraph(step, graph, graphToDisplay):
     graph.clear() # Clears the graph so there is no 'overlap' between previous steps
+
+    # Allow user to manually progress the graph
+   
+    if (step >= 1):
+        moveStep = input("Please input any value to move to the next step")
+    
+
+    
     netx.draw_spring(graphToDisplay.steps[step], with_labels = True, node_size = 500, node_color = 'lightblue', font_size = 10, font_weight = 'bold', ax = graph)
 
     if step == 0: # If it is the initial graph, state that it's the inital graph in the title
@@ -126,4 +136,4 @@ def updateGraph(step, graph, graphToDisplay):
         text += "\nDone!"
     graph.set_title(text, fontsize=12)    
 
-displayGraph(makeRandomGraph(), 1000)
+displayGraph(makeRandomGraph())
