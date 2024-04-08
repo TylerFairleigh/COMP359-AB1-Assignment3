@@ -1,6 +1,5 @@
 import networkx as netx
 import matplotlib.pyplot as plot
-import tkinter
 from matplotlib.animation import FuncAnimation as anim
 import random as rand
 
