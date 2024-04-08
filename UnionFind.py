@@ -1,5 +1,6 @@
 import networkx as netx
 import matplotlib.pyplot as plot
+from matplotlib.animation import FuncAnimation as anim
 import random as rand
 
 # You can declare the maximum number of possible nodes here
@@ -11,6 +12,7 @@ class UnionFind:
         self.parent = [1] * n # Create an array for parents which is the size n - 1
         self.size = [1] * n # Size array must be same size as parent array (used for union by size)
         self.graph = netx.Graph() # Declare NetworkX graph such that it can be
+        self.steps = [] # This keeps track of the steps for which the plot will display on each iteration of the algorithm for visualization purposes
 
     # implementation of Find with Path Compression
     def find(self, node):
@@ -25,6 +27,9 @@ class UnionFind:
     # implementation of Union By Size
     # This makes the node with more children the parent when attempting to joint two nodes
     def union(self, p, q):
+        # This ensures that the graph before the unions occur is copied such that it can be displayed
+        if len(self.steps) == 0:
+            self.steps.append(self.graph.copy())  # Store current step for visualization purposes
         r = self.find(p)
         s = self.find(q)
 
@@ -41,6 +46,7 @@ class UnionFind:
         #print("Joined " + str(r) + " with " + str(s))
         # This is solely used for visualiztion using the NetworkX library to add a node to the visual graph
         self.graph.add_edge(r, s)
+        self.steps.append(self.graph.copy())  # Store current step for visualization purposes
 
     # This will be called when a node is to be created
     def createElement(self, node):
@@ -88,13 +94,36 @@ def preMadeGraph():
     unionfind.union(5, 7)
     unionfind.union(8, 7)
     unionfind.union(9, 1)
-    print(unionfind.parent)
     return unionfind
 
-# Simply displays the output as well as the list of parent values
-def displayGraph(graphToDisplay):
-    netx.draw_spring(graphToDisplay.graph, with_labels=True, node_size=500, node_color='lightblue', font_size=10, font_weight='bold')
-    graphToDisplay.printGraphList()
+# Simply displays the output and updates for each step as well as the list of parent values
+# timer is in milliseconds
+def displayGraph(graphToDisplay, delayTimer):
+    graph, ax = plot.subplots()
+    update = anim(graph, updateGraph, frames = len(graphToDisplay.steps), fargs = (ax, graphToDisplay), interval = delayTimer, repeat = False)
+    graphToDisplay.printGraphList() # This call displays the graph parent list in the console
     plot.show()
 
-displayGraph(makeRandomGraph())
+# Updates graph for every step of the union
+def updateGraph(step, graph, graphToDisplay):
+    graph.clear() # Clears the graph so there is no 'overlap' between previous steps
+    netx.draw_spring(graphToDisplay.steps[step], with_labels = True, node_size = 500, node_color = 'lightblue', font_size = 10, font_weight = 'bold', ax = graph)
+
+    if step == 0: # If it is the initial graph, state that it's the inital graph in the title
+        graph.set_title("Initial Graph", fontsize=12)
+        return
+    
+    # Keep track of previous edges so we don't display them in current step
+    # If we don't do this, it would show all previous unions in text
+    previousUnions = graphToDisplay.steps[step - 1].edges()
+    union = graphToDisplay.steps[step].edges()
+
+    toDisplay = [edge for edge in union if edge not in previousUnions]
+    # Create the axis title based on the connected nodes
+    text = "Connected nodes " + ", ".join(f"{node1} and {node2}" for node1, node2 in toDisplay)
+    # If final step, tell user that the process has fininished by having "done" at the end of string
+    if step == len(graphToDisplay.steps) - 1:
+        text += "\nDone!"
+    graph.set_title(text, fontsize=12)    
+
+displayGraph(makeRandomGraph(), 1000)
