@@ -102,43 +102,35 @@ def preMadeGraph():
 # timer is in milliseconds
 def displayGraph(graphToDisplay):
     graph, ax = plot.subplots()
-    update = anim(graph, updateGraph, frames = len(graphToDisplay.steps), fargs = (ax, graphToDisplay), repeat = False)
+    if len(graphToDisplay.steps) == 0: # Instances where there are no edges, we still need to display the graph
+        netx.draw_spring(graphToDisplay.graph, with_labels = True, node_size = 700, node_color = 'skyblue', font_size = 10, font_weight = 'bold')
+    else:
+        update = anim(graph, updateGraph, frames = len(graphToDisplay.steps), fargs = (ax, graphToDisplay), repeat = False)
     graphToDisplay.printGraphList() # This call displays the graph parent list in the console
     plot.show()
 
 # Updates graph for every step of the union
 def updateGraph(step, graph, graphToDisplay):
-    graph.clear() # Clears the graph so there is no 'overlap' between previous steps
+    if (step < len(graphToDisplay.steps)):
+        graph.clear() # Clears the graph so there is no 'overlap' between previous steps
+        netx.draw_spring(graphToDisplay.steps[step], with_labels = True, node_size = 500, node_color = 'lightblue', font_size = 10, font_weight = 'bold', ax = graph)
 
-    # Allow user to manually progress the graph
-   
-    if (step >= 1 and step < len(graphToDisplay.steps) - 1):
-        kb.wait('right')
-        step+=1
-    
-    
+        # Keep track of previous edges so we don't display them in current step
+        # If we don't do this, it would show all previous unions in text
+        previousUnions = graphToDisplay.steps[step - 1].edges()
+        union = graphToDisplay.steps[step].edges()
 
-    
-    netx.draw_spring(graphToDisplay.steps[step], with_labels = True, node_size = 500, node_color = 'lightblue', font_size = 10, font_weight = 'bold', ax = graph)
+        toDisplay = [edge for edge in union if edge not in previousUnions]
+        # Create the axis title based on the connected nodes
+        text = "Connected nodes " + ", ".join(f"Step {step}: {node1} and {node2}" for node1, node2 in toDisplay)
+        # If final step, tell user that the process has fininished by having "done" at the end of string
+        if step == 0: # If it is the initial graph, state that it's the inital graph in the title
+            graph.set_title("Initial Graph", fontsize = 12)
+            return
+        if step == len(graphToDisplay.steps) - 1:
+            text += "\nDone!"
+        graph.set_title(text, fontsize=12)  
+        kb.wait('right') # Cannot progress until user enters right arrow
+        
 
-    if step == 0: # If it is the initial graph, state that it's the inital graph in the title
-        graph.set_title("Initial Graph", fontsize=12)
-        return
-    
-    # Keep track of previous edges so we don't display them in current step
-    # If we don't do this, it would show all previous unions in text
-    previousUnions = graphToDisplay.steps[step - 1].edges()
-    union = graphToDisplay.steps[step].edges()
-
-    toDisplay = [edge for edge in union if edge not in previousUnions]
-    # Create the axis title based on the connected nodes
-    text = "Connected nodes " + ", ".join(f"{node1} and {node2}" for node1, node2 in toDisplay)
-    # If final step, tell user that the process has fininished by having "done" at the end of string
-    if step == len(graphToDisplay.steps) - 1:
-        text += "\nDone!"
-    graph.set_title(text, fontsize=12)    
-
-
-
-
-displayGraph(makeRandomGraph())
+displayGraph(preMadeGraph())
