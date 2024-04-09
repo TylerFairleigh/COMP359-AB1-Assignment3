@@ -129,8 +129,15 @@ def updateGraph(step, graph, graphToDisplay):
             return
         if step == len(graphToDisplay.steps) - 1:
             text += "\nDone!"
-        graph.set_title(text, fontsize=12)  
-        kb.wait('right') # Cannot progress until user enters right arrow
+        graph.set_title(text, fontsize=12)
+
+        while(True):
+            event = kb.read_event()  # Read a keyboard event
+
+            if (kb.is_pressed('right')):  # Check if the event is a key press and if it's the specified key):
+                print ("Advancing to next step.")
+                break
         
+
 
 displayGraph(preMadeGraph())
