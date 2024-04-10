@@ -9,8 +9,8 @@ Path compression is done by recursively calling the find() function until we rea
 This means that each node should point to the root node of the tree which becomes its parent, compressing the path to the root node by simply pointing directly to the root node.
 
 > If we assume some node 3 has a parent 9.  
-> By the function call with union(3), the value returned will be 9.  
-> Thus, union(3) = 9.
+> By the function call with find(3), the value returned will be 9.  
+> Thus, find(3) = 9.
 </p>
 
 # The Union() Algorithm (Union by Size)
