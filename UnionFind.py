@@ -137,7 +137,5 @@ def updateGraph(step, graph, graphToDisplay):
             if (kb.is_pressed('right')):  # Check if the event is a key press and if it's the specified key):
                 print ("Advancing to next step.")
                 break
-        
 
-
-displayGraph(preMadeGraph())
+displayGraph(makeRandomGraph())
